@@ -1,0 +1,37 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mysql-router-cert
+  namespace: mysql
+spec:
+  # Secret names are always required.
+  secretName: mysql-router-tls
+  subject:
+    organizations:
+      - kasil
+  usages:
+    - server auth
+    - client auth
+  # At least one of a DNS Name, URI, or IP address is required.
+  dnsNames:
+    - mysql.svc.k8i.my-home-lab.cloud
+  # uris:
+  #   - spiffe://cluster.local/ns/sandbox/sa/example
+  # ipAddresses:
+  #   - 192.168.0.5
+  # Issuer references are always required.
+  issuerRef:
+    name: letsencrypt-with-route53
+    kind: ClusterIssuer
+---
+##====== FROM https://letsencrypt.org/certificates/
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysqlcluster-ca
+  namespace: mysql
+type: Opaque
+stringData:
+  ca.pem: |
+    READACTED
+

@@ -1,0 +1,32 @@
+nodeSelector:
+  storage: local
+
+ingressRoute:
+  dashboard:
+    enabled: false
+
+service:
+  enabled: true
+  type: LoadBalancer
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 192.168.1.4
+  spec:
+    loadBalancerClass: metallb
+
+logs:
+  general:
+    level: INFO
+
+ports:
+  web:
+    redirectTo: websecure
+
+# Ensure traefik publish the ingress information so argocd doesn't report "Progressing"
+# https://github.com/traefik/traefik/issues/7972
+providers:
+  kubernetesIngress:
+    publishedService:
+      enabled: true
+
+# Avoid send anynymous usage and check for newer version
+globalArguments: []

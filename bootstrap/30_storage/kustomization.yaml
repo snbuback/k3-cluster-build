@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: democratic-csi
+
+helmCharts:
+- name: democratic-csi
+  releaseName: nfs-provisioner
+  namespace: democratic-csi
+  repo: https://democratic-csi.github.io/charts/
+  version: "0.13.7"
+  valuesFile: values-nfs-provisioner.yaml
+
+- name: democratic-csi
+  releaseName: node-manual
+  namespace: democratic-csi
+  repo: https://democratic-csi.github.io/charts/
+  version: "0.13.7"
+  valuesFile: values-node-manual.yaml
+
+- name: democratic-csi
+  releaseName: zfs-local-provisioner
+  namespace: democratic-csi
+  repo: https://democratic-csi.github.io/charts/
+  version: "0.13.7"
+  valuesFile: values-local-provisioner.yaml
+
+resources:
+- ns.yaml

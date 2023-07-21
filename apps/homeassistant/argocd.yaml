@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: homeassistant
+  namespace: argocd
+spec:
+  destination:
+    namespace: homeassistant
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+      repoURL: git@github.com:REDACTED/kasil-apps.git
+      targetRevision: HEAD
+      path: apps/homeassistant
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    # automated: {}
+      # selfHeal: true
+
+  ignoreDifferences:
+    - group: ""  # v1
+      kind: PersistentVolume
+      name: homeassistant-config
+      jsonPointers:
+      - /spec/claimRef/resourceVersion
+      - /spec/claimRef/uid

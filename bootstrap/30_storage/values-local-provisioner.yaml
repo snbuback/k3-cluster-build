@@ -1,0 +1,78 @@
+# driver only works with 1.16+
+csiDriver:
+  # should be globally unique for a given cluster
+  name: "org.democratic-csi.zfs-local-dataset"
+  storageCapacity: true
+  fsGroupPolicy: File
+
+storageClasses:
+- name: zfs-local-dataset
+  defaultClass: false
+  reclaimPolicy: Delete
+  volumeBindingMode: Immediate
+  # distributed support is not yet ready for expansion
+  allowVolumeExpansion: false
+  parameters:
+    fsType: zfs
+  allowedTopologies:
+  - matchLabelExpressions:
+    - key: org.democratic-csi.topology/node
+      values:
+      - storage
+  mountOptions: []
+  secrets:
+    provisioner-secret:
+    controller-publish-secret:
+    node-stage-secret:
+    node-publish-secret:
+    controller-expand-secret:
+
+# if your cluster supports snapshots you may enable below
+volumeSnapshotClasses: []
+#- name: zfs-local-dataset
+#  secrets:
+#    snapshotter-secret:
+
+controller:
+  enabled: true
+  strategy: node
+  externalProvisioner:
+    extraArgs:
+    - --leader-election=false
+    - --node-deployment=true
+    - --node-deployment-immediate-binding=false
+    - --feature-gates=Topology=true
+    - --strict-topology=true
+    - --enable-capacity=true
+    - --capacity-ownerref-level=1
+
+  # distributed support is not yet ready
+  externalResizer:
+    enabled: false
+
+  externalSnapshotter:
+    enabled: true
+    extraArgs:
+    - --leader-election=false
+    - --node-deployment=true
+
+  nodeSelector:
+    storage: local
+
+driver:
+  config:
+    driver: zfs-local-dataset
+    zfs:
+      datasetParentName: main/k8s/v
+      detachedSnapshotsDatasetParentName: main/k8s/s
+
+      datasetProperties:
+        # key: value
+
+      datasetEnableQuotas: true
+      datasetEnableReservation: false
+
+node:
+  kubeletHostPath: "/mnt/main/kubernetes/data/kubelet"
+  nodeSelector:
+    storage: local

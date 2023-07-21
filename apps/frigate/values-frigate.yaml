@@ -1,0 +1,42 @@
+# values.yaml
+config: |
+   REDACTED
+
+envFromSecrets:
+  - frigate-rstp-credentials
+
+coral:
+  enabled: true
+  hostPath: /dev/bus/usb
+
+shmSize: 128Mi
+
+ingress:
+  enabled: true
+  ingress.annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-with-route53-stag
+
+  hosts:
+    - host: frigate.k8.my-home-lab.cloud
+      paths:
+        - '/'
+  tls:
+    - secretName: frigate-tls
+      hosts:
+        - frigate.k8.my-home-lab.cloud
+
+persistence:
+  data:
+    enabled: true
+    storageClass: "-"
+    existingClaim: frigate-media-pvc
+    subPath: /configs
+
+extraVolumeMounts:
+  - mountPath: /media
+    name: data
+
+nodeSelector:
+  kubernetes.io/hostname: "kube0"

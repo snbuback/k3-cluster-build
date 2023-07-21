@@ -1,0 +1,32 @@
+apiVersion: v1
+data:
+  rootHost: REDACTED
+  rootPassword: REDACTED
+  rootUser: REDACTED
+kind: Secret
+metadata:
+  name: mysqlroot
+  namespace: mysql
+type: Opaque
+---
+apiVersion: mysql.oracle.com/v2
+kind: InnoDBCluster
+metadata:
+  name: mysqlcluster
+  namespace: mysql
+spec:
+  secretName: mysqlroot
+  tlsUseSelfSigned: true
+  # tlsSecretName: mysql-router-tls
+  instances: 1
+  router:
+    instances: 1
+    # tlsSecretName: mysql-router-tls
+  datadirVolumeClaimTemplate:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+    storageClassName: ""
+    volumeName: mysql-data

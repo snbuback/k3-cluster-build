@@ -1,0 +1,35 @@
+namespaceOverride: monitoring
+
+prometheusOperator:
+  admissionWebhooks:
+    certManager:
+      enabled: true
+      admissionCert:
+        issuerRef:
+          name: "letsencrypt-with-route53"
+          kind: "ClusterIssuer"
+
+thanosRuler:
+  thanosRulerSpec:
+    nodeSelector:
+      storage: local
+
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      storage: local
+
+grafana:
+  ingress:
+    enabled: true
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      cert-manager.io/cluster-issuer: letsencrypt-with-route53
+    hosts:
+    - grafana.k8.my-home-lab.cloud
+    tls:
+      - secretName: grafana-general-tls
+        hosts:
+          - grafana.k8.my-home-lab.cloud
+    # adminPassword: 

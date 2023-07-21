@@ -1,0 +1,2 @@
+envs:
+  k8sClusterDomain: k8i.my-home-lab.cloud

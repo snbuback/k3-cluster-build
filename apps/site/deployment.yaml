@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: site
+  name: default-site
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: default-site
+      app.kubernetes.io/part-of: site
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: default-site
+        app.kubernetes.io/part-of: site
+    spec:
+      # volumes:
+      #   - name: c-vol
+      #     persistentVolumeClaim:
+      #       claimName: test-pvc
+      containers:
+        - name: service
+          image: nginx
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: 256M
+              cpu: "250m"
+          # volumeMounts:
+          #   - mountPath: "/usr/share/nginx/html"
+          #     name: c-vol
+      nodeSelector:
+        storage: remote

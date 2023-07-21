@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: default-site
+  namespace: site
+  annotations:
+    traefik.ingress.kubernetes.io/router.priority: "1"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-with-route53
+spec:
+  defaultBackend:
+    service:
+      name: default-site
+      port:
+        number: 80
+  tls:
+    - secretName: default-site-cert
+      hosts:
+        - "*.k8.my-home-lab.cloud"
+  # the rule below is required to avoid argocd reporting as progressing
+  rules:
+    - host: www.k8.my-home-lab.cloud
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: default-site
+                port:
+                  number: 80

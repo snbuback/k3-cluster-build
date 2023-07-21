@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mysql
+  namespace: argocd
+spec:
+  destination:
+    namespace: mysql
+    server: "https://kubernetes.default.svc"
+  project: default
+  sources:
+
+  # Operator
+  - repoURL: 'https://mysql.github.io/mysql-operator'
+    chart: mysql-operator
+    targetRevision: "2.0.10"
+    helm:
+      valueFiles:
+      - $values/apps/mysql/values-mysql-operator.yaml
+
+  # Repo itself
+  - repoURL: 'git@github.com:REDACTED/kasil-apps.git'
+    path: "apps/mysql"
+    targetRevision: HEAD
+    ref: values
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    # automated: {}
+      # selfHeal: true
+
+  ignoreDifferences:
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    jqPathExpressions:
+      - ".spec.versions[] | .schema.openAPIV3Schema.properties.spec.properties.keyring.properties.oci.properties.endpoints.description"
+
+  - group: ""  # v1
+    kind: PersistentVolume
+    name: mysql-data
+    jsonPointers:
+    - /spec/claimRef/resourceVersion
+    - /spec/claimRef/uid

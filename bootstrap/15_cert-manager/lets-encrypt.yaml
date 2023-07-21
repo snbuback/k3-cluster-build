@@ -1,0 +1,47 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-with-route53
+  namespace: cert-manager
+spec:
+  acme: &acme-cert
+    # The ACME server URL
+    server: https://acme-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: REDACTED+acme@gmail.com
+    privateKeySecretRef:
+      # Name of a secret used to store the ACME account private key
+      name: letsencrypt--prod-private-key
+    solvers:
+      - dns01:
+          route53:
+            accessKeyID: REDACTED
+            region: eu-west-1
+            secretAccessKeySecretRef:
+              name: aws-route53-secret-access-key-secret
+              key: secret-access-key
+---
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-with-route53-stag
+  namespace: cert-manager
+spec:
+  acme:
+    # The ACME server URL
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Email address used for ACME registration
+    email: REDACTED+acme@gmail.com
+    privateKeySecretRef:
+      # Name of a secret used to store the ACME account private key
+      name: letsencrypt--prod-private-key
+    solvers:
+      - dns01:
+          route53:
+            accessKeyID: REDACTED
+            region: eu-west-1
+            secretAccessKeySecretRef:
+              name: aws-route53-secret-access-key-secret
+              key: secret-access-key

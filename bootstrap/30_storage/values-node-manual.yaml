@@ -1,0 +1,13 @@
+csiDriver:
+  name: "org.democratic-csi.node-manual"
+
+controller:
+  enabled: false
+
+driver:
+  config:
+    driver: node-manual
+
+node:
+  nodeSelector:
+    storage: remote
